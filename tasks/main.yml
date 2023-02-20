@@ -1,0 +1,31 @@
+# Copyright (c) 2023, Bennett Samowich <bennett@foolean.org>
+# All rights reserved
+# SPDX short identifier: BSD-3-Clause
+---
+
+- name: Configure postfix
+  block:
+    - name: Collecting package facts
+      become: true
+      ansible.builtin.package_facts:
+        manager: auto
+      when:
+        - "ansible_facts.packages is not defined"
+
+    - name: Ensure mail transfer agent is configured for local-only mode (CIS)
+      ansible.builtin.lineinfile:
+        path: '/etc/postfix/main.cf'
+        regexp: "^inet_interfaces .*= "
+        line: 'inet_interfaces = loopback-only'
+      when:
+        - "'postfix' in ansible_facts.packages"
+
+    - name: Disable postfix daemon
+      ansible.builtin.systemd:
+        name: 'postfix.service'
+        enabled: false
+        state: stopped
+      when:
+        - "'postfix' in ansible_facts.packages"
+  tags:
+    - 'foolean_postfix'
