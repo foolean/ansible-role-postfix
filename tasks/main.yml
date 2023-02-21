@@ -13,6 +13,7 @@
         - "ansible_facts.packages is not defined"
 
     - name: Ensure mail transfer agent is configured for local-only mode (CIS)
+      become: true
       ansible.builtin.lineinfile:
         path: '/etc/postfix/main.cf'
         regexp: "^inet_interfaces .*= "
@@ -21,6 +22,7 @@
         - "'postfix' in ansible_facts.packages"
 
     - name: Disable postfix daemon
+      become: true
       ansible.builtin.systemd:
         name: 'postfix.service'
         enabled: false
