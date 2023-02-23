@@ -3,8 +3,12 @@
 # SPDX short identifier: BSD-3-Clause
 ---
 
-- name: Configure postfix
+# We put the entire role in a block so we can create
+# a role specific tag, which saves the caller from
+# having to do so in their playbook.
+- name: Role foolean/postfix
   block:
+
     - name: Collecting package facts
       become: true
       ansible.builtin.package_facts:
@@ -29,5 +33,7 @@
         state: stopped
       when:
         - "'postfix' in ansible_facts.packages"
+
+  # Tags to be applied to this role (block)
   tags:
-    - 'foolean_postfix'
+    - 'role_foolean_postfix'
